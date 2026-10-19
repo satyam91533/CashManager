@@ -5,12 +5,15 @@ import android.os.Bundle;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.webkit.WebChromeClient;
 
 public class MainActivity extends Activity {
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         WebView web = new WebView(this);
         web.setWebViewClient(new WebViewClient());
+        // Enable JavaScript alert() and confirm() dialogs in the WebView.
+        web.setWebChromeClient(new WebChromeClient());
         WebSettings settings = web.getSettings();
         settings.setJavaScriptEnabled(true);
         settings.setDomStorageEnabled(true);
