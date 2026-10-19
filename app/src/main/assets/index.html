@@ -192,8 +192,10 @@ function save(buttonKind){const kind=buttonKind||$('kind').value;const amount=Nu
  if(!$('person').value.trim()){alert(kind==='paid'?'Please enter who the money was paid to.':'Please enter who the money was received from.');return}
  if(!$('description').value.trim()){alert(kind==='paid'?'Please enter why the money was paid.':'Please enter why the money was received.');return}
  const tx={id:editing||String(Date.now())+Math.random().toString(16).slice(2),kind,amount,person:$('person').value.trim(),description:$('description').value.trim(),date,cashBreakdown:Object.fromEntries(denominations.map(d=>[d,Math.max(0,Math.floor(Number($('txden'+d)?.value)||0))])),created:editing?(data.transactions.find(t=>t.id===editing)||{}).created||Date.now():Date.now()};
- if(editing)data.transactions=data.transactions.map(t=>t.id===editing?tx:t);else data.transactions.push(tx);
- resetForm();persist()
+ const wasEditing=Boolean(editing);
+ if(wasEditing)data.transactions=data.transactions.map(t=>t.id===editing?tx:t);else data.transactions.push(tx);
+ resetForm();persist();
+ alert(wasEditing?'Transaction updated successfully!':(kind==='received'?'Money received successfully!':'Payment saved successfully!'));
 }
 function resetForm(){editing=null;$('amount').value='';$('person').value='';$('description').value='';$('date').value=nowLocal();$('kind').value='received';for(const den of denominations){if($('txden'+den))$('txden'+den).value=0}calculateTxCash();$('formTitle').textContent='＋ New Transaction';$('cancelEdit').style.display='none'}
 function editTx(id){const t=data.transactions.find(x=>x.id===id);if(!t)return;editing=id;$('kind').value=t.kind;$('amount').value=t.amount;$('person').value=t.person;$('description').value=t.description;$('date').value=t.date;for(const den of denominations){if($('txden'+den))$('txden'+den).value=(t.cashBreakdown||{})[den]||0}calculateTxCash();$('formTitle').textContent='Edit Transaction';$('cancelEdit').style.display='block';window.scrollTo({top:0,behavior:'smooth'})}
