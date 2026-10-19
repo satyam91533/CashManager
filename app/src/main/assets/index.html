@@ -179,13 +179,13 @@ function calculateCashCount(){
  label.classList.add(Math.abs(diff)<0.005?'difference-zero':(diff>0?'difference-positive':'difference-negative'));
  $('differenceNote').textContent=Math.abs(diff)<0.005?'Cash count and ledger balance match.':(diff>0?'Counted cash is more than the available balance.':'Counted cash is less than the available balance.');
 }
-function resetCashCount(){for(const den of denominations)$('den'+den).value=0;calculateCashCount()}
+function resetCashCount(){if(!confirm('Reset all cash-count quantities to zero?'))return;for(const den of denominations)$('den'+den).value=0;calculateCashCount();alert('Cash count reset successfully!')}
 function calculateTxCash(){let total=0;for(const den of denominations)total+=den*Math.max(0,Math.floor(Number($('txden'+den)?.value)||0));if($('txCashTotal'))$('txCashTotal').textContent=money(total);return total}
-function useTxCashTotal(){const total=calculateTxCash();if(total<=0){alert('Enter at least one note or coin quantity.');return} $('amount').value=total.toFixed(2)}
+function useTxCashTotal(){const total=calculateTxCash();if(total<=0){alert('Enter at least one note or coin quantity.');return}if(!confirm('Use '+money(total)+' as transaction amount?'))return;$('amount').value=total.toFixed(2);alert('Amount filled successfully!')}
 
 
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function setOpening(){const raw=$('openingInput').value;const n=Number(raw);if(raw.trim()===''||!Number.isFinite(n)||n<0){alert('Enter a valid opening balance.');return}data.opening=n;persist();alert('Opening balance saved successfully!')}
+function setOpening(){const raw=$('openingInput').value;const n=Number(raw);if(raw.trim()===''||!Number.isFinite(n)||n<0){alert('Enter a valid opening balance.');return}if(!confirm('Confirm opening balance: '+money(n)+'?'))return;data.opening=n;persist();alert('Opening balance saved successfully!')}
 function save(buttonKind){const kind=buttonKind||$('kind').value;const amount=Number($('amount').value);
  if(!Number.isFinite(amount)||amount<=0){alert('Please enter an amount greater than zero.');return}
  const date=$('date').value;if(!date){alert('Please select date and time.');return}
@@ -199,10 +199,11 @@ function save(buttonKind){const kind=buttonKind||$('kind').value;const amount=Nu
 }
 function resetForm(){editing=null;$('amount').value='';$('person').value='';$('description').value='';$('date').value=nowLocal();$('kind').value='received';for(const den of denominations){if($('txden'+den))$('txden'+den).value=0}calculateTxCash();$('formTitle').textContent='＋ New Transaction';$('cancelEdit').style.display='none'}
 function editTx(id){const t=data.transactions.find(x=>x.id===id);if(!t)return;editing=id;$('kind').value=t.kind;$('amount').value=t.amount;$('person').value=t.person;$('description').value=t.description;$('date').value=t.date;for(const den of denominations){if($('txden'+den))$('txden'+den).value=(t.cashBreakdown||{})[den]||0}calculateTxCash();$('formTitle').textContent='Edit Transaction';$('cancelEdit').style.display='block';window.scrollTo({top:0,behavior:'smooth'})}
-function deleteTx(id){if(!confirm('Delete this transaction? This will recalculate the running balance.'))return;data.transactions=data.transactions.filter(t=>t.id!==id);if(editing===id)resetForm();persist()}
-function applyFilters(){activeFilters={from:$('filterFrom').value,to:$('filterTo').value,kind:$('filterType').value,person:$('filterPerson').value.trim(),text:$('filterText').value.trim()};render()}
-function clearFilters(){$('filterFrom').value=cutoffDate();$('filterTo').value=today();$('filterType').value='all';$('filterPerson').value='';$('filterText').value='';activeFilters={from:$('filterFrom').value,to:$('filterTo').value,kind:'all',person:'',text:''};render()}
+function deleteTx(id){if(!confirm('Confirm delete this transaction? The balance will be recalculated.'))return;data.transactions=data.transactions.filter(t=>t.id!==id);if(editing===id)resetForm();persist();alert('Transaction deleted successfully!')}
+function applyFilters(){if(!confirm('Apply the selected history filters?'))return;activeFilters={from:$('filterFrom').value,to:$('filterTo').value,kind:$('filterType').value,person:$('filterPerson').value.trim(),text:$('filterText').value.trim()};render();alert('Filters applied successfully!')}
+function clearFilters(){if(!confirm('Clear all history filters?'))return;$('filterFrom').value=cutoffDate();$('filterTo').value=today();$('filterType').value='all';$('filterPerson').value='';$('filterText').value='';activeFilters={from:$('filterFrom').value,to:$('filterTo').value,kind:'all',person:'',text:''};render();alert('Filters cleared successfully!')}
 function printHistory(){
+  if(!confirm('Open the print dialog to print or save transaction history as PDF?'))return;
   const title='Cash Manager - Transaction History';
   const filterSummary=[
     activeFilters.from?'From: '+activeFilters.from:'',
@@ -229,12 +230,12 @@ function printHistory(){
     window.print();
   }
 }
-function showAll(){clearFilters()}
-function exportCSV(){const ts=sorted();let bal=Number(data.opening)||0;const lines=[['Date & Time','Type','Person / Paid To or Received From','Reason / Purpose','Received','Paid','Balance After Transaction']];
+function showAll(){if(!confirm('Show all transactions from the last six months?'))return;$('filterFrom').value=cutoffDate();$('filterTo').value=today();$('filterType').value='all';$('filterPerson').value='';$('filterText').value='';activeFilters={from:$('filterFrom').value,to:$('filterTo').value,kind:'all',person:'',text:''};render();alert('All retained history displayed successfully!')}
+function exportCSV(){if(!confirm('Export the currently filtered history to a CSV file?'))return;const ts=sorted();let bal=Number(data.opening)||0;const lines=[['Date & Time','Type','Person / Paid To or Received From','Reason / Purpose','Received','Paid','Balance After Transaction']];
  const allowed=new Set();let calc=Number(data.opening)||0;for(const t of ts){calc+=t.kind==='received'?Number(t.amount):-Number(t.amount);const day=String(t.date).slice(0,10);const match=(!activeFilters.from||day>=activeFilters.from)&&(!activeFilters.to||day<=activeFilters.to)&&(activeFilters.kind==='all'||t.kind===activeFilters.kind)&&(!activeFilters.person||String(t.person||'').toLowerCase().includes(activeFilters.person.toLowerCase()))&&(!activeFilters.text||(String(t.description||'').toLowerCase().includes(activeFilters.text.toLowerCase())||String(t.person||'').toLowerCase().includes(activeFilters.text.toLowerCase())));if(match)allowed.add(t.id)}
  for(const t of ts){const inc=t.kind==='received'?Number(t.amount):0,out=t.kind==='paid'?Number(t.amount):0;bal+=inc-out;if(allowed.has(t.id))lines.push([t.date,t.kind,t.person,t.description,inc,out,bal.toFixed(2)])}
  const csv=lines.map(row=>row.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\r\n');
- const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='cash-manager-'+today()+'.csv';a.click();URL.revokeObjectURL(url)}
+ const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='cash-manager-'+today()+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);alert('CSV export started successfully!')}
 $('kind').addEventListener('change',()=>{});for(const den of denominations){$('den'+den).addEventListener('input',calculateCashCount);const tx=$('txden'+den);if(tx)tx.addEventListener('input',calculateTxCash)}load();calculateTxCash();
 </script>
 </body></html>
