@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#075e54">
+<title>Cash Manager</title>
+<style>
+:root{font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;color:#142b2a;background:linear-gradient(145deg,#f0fdfa,#f4f7fb)}
+*{box-sizing:border-box}body{margin:0}header{background:linear-gradient(130deg,#047857,#0f766e,#2563eb);color:white;padding:22px 18px 26px;border-radius:0 0 26px 26px;box-shadow:0 10px 28px #075e5428}
+header h1{margin:0;font-size:25px}header p{margin:5px 0 18px;color:#cfe4dc;font-size:13px}
+.balance-label{font-size:13px;color:#cfe4dc}.balance{font-size:34px;font-weight:750;margin-top:4px}
+main{padding:16px;max-width:720px;margin:auto}.cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:-3px}
+.card{background:white;border:1px solid #e1eeeb;border-radius:16px;padding:14px;box-shadow:0 5px 18px #0f766e0d}
+.card small{display:block;color:#65736f;font-size:12px}.card strong{display:block;font-size:20px;margin-top:7px;overflow-wrap:anywhere}
+.green{color:#16834a}.red{color:#c52d37}.section{background:white;border:1px solid #e4eeec;border-radius:17px;padding:16px;margin-top:14px;box-shadow:0 6px 20px #0f766e0b}
+h2{font-size:17px;margin:0 0 13px}label{display:block;font-size:13px;font-weight:650;margin:10px 0 5px}
+input,select,button{font:inherit}input,select{width:100%;padding:12px;border:1px solid #d8e0dc;border-radius:9px;background:white}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:13px}
+button{border:0;border-radius:12px;padding:12px;font-weight:750;cursor:pointer;transition:transform .12s,filter .12s}button:active{transform:scale(.98)}.receive{background:linear-gradient(135deg,#059669,#10b981);color:white}.paid{background:linear-gradient(135deg,#dc2626,#f97316);color:white}.neutral{background:#edf4f2;color:#203b37}
+#history{display:flex;flex-direction:column;gap:9px}.entry{border:1px solid #e3e9e6;border-radius:11px;padding:12px}.entry-top{display:flex;justify-content:space-between;gap:10px}.entry small{color:#687770}.entry p{margin:5px 0;font-size:13px}.entry .tools{display:flex;gap:7px;margin-top:8px}.tools button{padding:7px 10px;font-size:12px}
+.note{font-size:12px;color:#64716b;line-height:1.5}.empty{color:#6b7772;text-align:center;padding:20px 5px}
+@media print{
+      body{background:#fff;color:#111}
+      header{background:#fff!important;color:#111!important;border-radius:0;padding:8px 0 14px}
+      header p,.balance-label{color:#333!important}
+      main{max-width:none;padding:0}
+      .cards{margin:0}
+      .section{box-shadow:none;border:1px solid #bbb;break-inside:avoid}
+      .section:first-of-type,.section:nth-of-type(2){display:none!important}
+      .section label,.section input,.section select,.section .actions,.section>.row button,.section>button,.note,.tools{display:none!important}
+      .section h2{margin-bottom:8px}
+      .entry{break-inside:avoid;border:1px solid #ddd}
+      button{display:none!important}
+      #history{gap:5px}
+      .entry-top{display:flex}
+      .entry p{font-size:11px}
+    }
+.difference-positive{color:#c52d37!important}.difference-negative{color:#c07a00!important}.difference-zero{color:#16834a!important}
+@media print{#cashCountSection{break-inside:avoid}}
+
+/* Simple, mobile-first interface */
+header{padding:18px 16px 22px;border-radius:0 0 18px 18px}
+header h1{font-size:23px}.balance{font-size:32px}
+main{padding:12px;max-width:600px}
+.cards{gap:8px}.card{padding:12px;border-radius:12px}.card strong{font-size:18px}
+.section{padding:14px;margin-top:12px;border-radius:13px}
+.section h2{font-size:16px;margin-bottom:10px}
+input,select{padding:11px;font-size:16px}
+button{padding:12px;font-size:14px;min-height:44px}
+.actions{gap:8px}
+.collapsible{padding:0;overflow:hidden}
+.collapsible summary{padding:15px;cursor:pointer;list-style:none;font-weight:750;font-size:15px;display:flex;align-items:center;justify-content:space-between}
+.collapsible summary::-webkit-details-marker{display:none}
+.collapsible summary:after{content:'＋';font-size:20px;color:#587066}
+.collapsible[open] summary:after{content:'−'}
+.collapsible .inside{padding:0 14px 14px}
+.helper{font-size:12px;color:#64716b;margin:5px 0 0}
+@media(max-width:380px){.row{grid-template-columns:1fr}.cards{grid-template-columns:1fr 1fr}.balance{font-size:29px}}
+@media print{.collapsible summary{display:none!important}.collapsible .inside{display:block!important;padding:0}}
+</style>
+</head>
+<body>
+<header><h1>💰 Cash Manager</h1><p>Your daily cash book · Works offline</p><div class="balance-label">CURRENT CLOSING BALANCE</div><div class="balance" id="balance">₹0.00</div></header>
+<main>
+<div class="cards">
+<div class="card"><small>Opening Balance</small><strong id="opening">₹0.00</strong></div>
+<div class="card"><small>Total Received</small><strong class="green" id="totalIn">₹0.00</strong></div>
+<div class="card"><small>Total Paid</small><strong class="red" id="totalOut">₹0.00</strong></div>
+<div class="card"><small>Transactions</small><strong id="count">0</strong></div>
+</div>
+<details class="section collapsible">
+<summary>⚙️ Set Opening Balance</summary><div class="inside">
+<label for="openingInput">Opening cash amount (₹)</label>
+<input id="openingInput" type="number" min="0" step="0.01" placeholder="e.g. 10000">
+<button class="neutral" style="width:100%;margin-top:10px" onclick="setOpening()">Save Opening Balance</button>
+<p class="note">Set this once to start. Your balance updates automatically.</p>
+</div></details>
+<section class="section">
+<h2 id="formTitle">＋ New Transaction</h2>
+<div class="row">
+<div><label for="kind">Transaction Type</label><select id="kind"><option value="received">Money Received</option><option value="paid">Money Paid</option></select></div>
+<div><label for="amount">Total Amount (₹)</label><input id="amount" type="number" min="0.01" step="0.01" placeholder="0.00"></div>
+</div>
+<div class="row">
+<div><label for="person" id="personLabel">Person / Name</label><input id="person" maxlength="80" placeholder="Enter person name" required></div>
+<div><label for="date">Date & Time</label><input id="date" type="datetime-local" required></div>
+</div>
+<label for="description" id="reasonLabel">Reason / Purpose</label><input id="description" maxlength="160" placeholder="e.g. shop rent, groceries, loan" required>
+<details class="collapsible" style="border:1px solid #dce9e6;border-radius:13px;margin-top:12px"><summary>🪙 Count notes / coins (optional)</summary><div class="inside"><p class="note">Enter the quantity of each denomination. Tap “Use Total” to fill the transaction amount.</p><div class="row"><div><label for="txden500">₹500 notes / coins</label><input id="txden500" type="number" min="0" step="1" value="0" inputmode="numeric"></div><div><label for="txden200">₹200 notes / coins</label><input id="txden200" type="number" min="0" step="1" value="0" inputmode="numeric"></div><div><label for="txden100">₹100 notes / coins</label><input id="txden100" type="number" min="0" step="1" value="0" inputmode="numeric"></div><div><label for="txden50">₹50 notes / coins</label><input id="txden50" type="number" min="0" step="1" value="0" inputmode="numeric"></div><div><label for="txden20">₹20 notes / coins</label><input id="txden20" type="number" min="0" step="1" value="0" inputmode="numeric"></div><div><label for="txden10">₹10 notes / coins</label><input id="txden10" type="number" min="0" step="1" value="0" inputmode="numeric"></div><div><label for="txden5">₹5 notes / coins</label><input id="txden5" type="number" min="0" step="1" value="0" inputmode="numeric"></div><div><label for="txden2">₹2 notes / coins</label><input id="txden2" type="number" min="0" step="1" value="0" inputmode="numeric"></div><div><label for="txden1">₹1 notes / coins</label><input id="txden1" type="number" min="0" step="1" value="0" inputmode="numeric"></div></div><div class="card" style="margin-top:10px"><small>Cash Total</small><strong id="txCashTotal">₹0.00</strong></div><button class="neutral" style="width:100%;margin-top:10px" onclick="useTxCashTotal()">Use Total as Amount</button></div></details><div class="actions"><button class="receive" onclick="save('received')">＋ Save Received</button><button class="paid" onclick="save('paid')">− Save Paid</button></div>
+<button id="cancelEdit" class="neutral" style="display:none;width:100%;margin-top:8px" onclick="resetForm()">Cancel Edit</button>
+</section>
+
+<details class="section collapsible" id="cashCountSection">
+<summary>🪙 Cash Count</summary><div class="inside">
+<p class="note">Enter the quantity of each note or coin. Total cash, available balance, and difference update automatically.</p>
+<div class="row">
+<div><label for="den500">₹500 × Quantity</label><input id="den500" type="number" min="0" step="1" value="0" inputmode="numeric"></div>
+<div><label for="den200">₹200 × Quantity</label><input id="den200" type="number" min="0" step="1" value="0" inputmode="numeric"></div>
+<div><label for="den100">₹100 × Quantity</label><input id="den100" type="number" min="0" step="1" value="0" inputmode="numeric"></div>
+<div><label for="den50">₹50 × Quantity</label><input id="den50" type="number" min="0" step="1" value="0" inputmode="numeric"></div>
+<div><label for="den20">₹20 × Quantity</label><input id="den20" type="number" min="0" step="1" value="0" inputmode="numeric"></div>
+<div><label for="den10">₹10 × Quantity</label><input id="den10" type="number" min="0" step="1" value="0" inputmode="numeric"></div>
+<div><label for="den5">₹5 × Quantity</label><input id="den5" type="number" min="0" step="1" value="0" inputmode="numeric"></div>
+<div><label for="den2">₹2 × Quantity</label><input id="den2" type="number" min="0" step="1" value="0" inputmode="numeric"></div>
+<div><label for="den1">₹1 × Quantity</label><input id="den1" type="number" min="0" step="1" value="0" inputmode="numeric"></div>
+</div>
+<div class="card" style="margin-top:12px"><small>Total Cash Counted</small><strong id="countedCash">₹0.00</strong></div>
+<div class="card" style="margin-top:10px"><small>Available Balance (ledger)</small><strong id="availableCash">₹0.00</strong></div>
+<div class="card" style="margin-top:10px"><small>Difference (Cash Count − Available Balance)</small><strong id="cashDifference">₹0.00</strong><small id="differenceNote">Cash count and ledger balance match.</small></div>
+<button class="neutral" style="width:100%;margin-top:12px" onclick="resetCashCount()">Reset Count</button>
+</div></details>
+
+<details class="section collapsible">
+<summary>📒 History & Reports</summary><div class="inside">
+<h2>Transaction History (Last 6 Months)</h2>
+<div class="row">
+<div><label for="filterFrom">From date</label><input id="filterFrom" type="date"></div>
+<div><label for="filterTo">To date</label><input id="filterTo" type="date"></div>
+</div>
+<div class="row">
+<div><label for="filterType">Transaction type</label><select id="filterType"><option value="all">Received + Paid</option><option value="received">Received only</option><option value="paid">Paid only</option></select></div>
+<div><label for="filterPerson">Person / Name</label><input id="filterPerson" placeholder="Search name" maxlength="80"></div>
+</div>
+<label for="filterText">Reason / details</label><input id="filterText" placeholder="Search reason or description" maxlength="160">
+<div class="actions" style="margin-bottom:12px"><button class="neutral" onclick="applyFilters()">Apply Filters</button><button class="neutral" onclick="clearFilters()">Clear Filters</button></div>
+<div class="row" style="margin-bottom:12px"><button class="neutral" onclick="exportCSV()">Export CSV (filtered)</button><button class="neutral" onclick="printHistory()">Print / Save PDF</button></div>
+<div style="margin-bottom:12px"><button class="neutral" style="width:100%" onclick="showAll()">Show All (6 months)</button></div>
+<div id="history"></div>
+<p class="note">Transactions are kept for the last 6 months. Search by name, date, or reason.</p>
+</div></details>
+<p class="note" style="padding:6px 2px">Your data stays on this device. Clearing app data or uninstalling may erase it. Export CSV regularly as a backup. No data is sent online.</p>
+</main>
+<script>
+const KEY='cashManager.v1';
+let data={opening:0,transactions:[]},editing=null;let activeFilters={from:'',to:'',kind:'all',person:'',text:''};
+const $=id=>document.getElementById(id);
+const money=n=>'₹'+Number(n||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+const nowLocal=()=>{const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,16)};
+const today=()=>nowLocal().slice(0,10);
+const displayDateTime=value=>{const d=new Date(value);return Number.isNaN(d.getTime())?String(value):d.toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'})};
+function cutoffDate(){const d=new Date();d.setMonth(d.getMonth()-6);d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,10)}
+function pruneOld(){const cutoff=cutoffDate();data.transactions=data.transactions.filter(t=>String(t.date).slice(0,10)>=cutoff)}
+function load(){try{const s=localStorage.getItem(KEY);if(s)data=JSON.parse(s)}catch(e){};if(!Array.isArray(data.transactions))data.transactions=[];pruneOld();$('date').value=nowLocal();$('openingInput').value=data.opening;$('filterFrom').value=cutoffDate();$('filterTo').value=today();persist()}
+function persist(){pruneOld();localStorage.setItem(KEY,JSON.stringify(data));render()}
+function sorted(){return [...data.transactions].sort((a,b)=>a.date.localeCompare(b.date)||a.created-b.created)}
+function totals(){return data.transactions.reduce((o,t)=>{o[t.kind==='received'?'in':'out']+=Number(t.amount);return o},{in:0,out:0})}
+function render(){
+ const ts=sorted(),tot=totals();let bal=Number(data.opening)||0;
+ $('opening').textContent=money(data.opening);$('totalIn').textContent=money(tot.in);$('totalOut').textContent=money(tot.out);
+ $('balance').textContent=money(bal+tot.in-tot.out);$('count').textContent=ts.length;if(typeof calculateCashCount==='function')calculateCashCount();
+ let running=bal;const rows=ts.map(t=>{running+=t.kind==='received'?Number(t.amount):-Number(t.amount);return {...t,running}});
+ const filtered=rows.filter(t=>{
+   const day=String(t.date).slice(0,10);
+   return (!activeFilters.from||day>=activeFilters.from)&&(!activeFilters.to||day<=activeFilters.to)&&
+   (activeFilters.kind==='all'||t.kind===activeFilters.kind)&&
+   (!activeFilters.person||String(t.person||'').toLowerCase().includes(activeFilters.person.toLowerCase()))&&
+   (!activeFilters.text||(String(t.description||'').toLowerCase().includes(activeFilters.text.toLowerCase())||String(t.person||'').toLowerCase().includes(activeFilters.text.toLowerCase())));
+ });
+ $('history').innerHTML=filtered.length?filtered.slice().reverse().map(t=>`<div class="entry"><div class="entry-top"><div><b>${t.kind==='received'?'Received':'Paid'} ${money(t.amount)}</b><br><small>${esc(displayDateTime(t.date))} · Balance after entry: ${money(t.running)}</small></div><b class="${t.kind==='received'?'green':'red'}">${t.kind==='received'?'+':'−'}${money(t.amount)}</b></div><p>${esc(t.person||'No person specified')}${t.description?' · '+esc(t.description):''}</p><div class="tools"><button class="neutral" onclick="editTx('${t.id}')">Edit</button><button class="neutral" onclick="deleteTx('${t.id}')">Delete</button></div></div>`).join(''):'<div class="empty">No matching transactions in the selected date range.</div>';
+}
+
+const denominations=[500,200,100,50,20,10,5,2,1];
+function calculateCashCount(){
+ let total=0;
+ for(const den of denominations){
+   const input=$('den'+den);
+   const qty=Math.max(0,Math.floor(Number(input.value)||0));
+   if(String(input.value)!=='' && Number(input.value)<0) input.value=0;
+   total+=den*qty;
+ }
+ const totalsNow=totals();
+ const available=(Number(data.opening)||0)+totalsNow.in-totalsNow.out;
+ const diff=total-available;
+ $('countedCash').textContent=money(total);
+ $('availableCash').textContent=money(available);
+ $('cashDifference').textContent=(diff>0?'+':'')+money(diff);
+ const label=$('cashDifference');
+ label.classList.remove('difference-positive','difference-negative','difference-zero');
+ label.classList.add(Math.abs(diff)<0.005?'difference-zero':(diff>0?'difference-positive':'difference-negative'));
+ $('differenceNote').textContent=Math.abs(diff)<0.005?'Cash count and ledger balance match.':(diff>0?'Counted cash is more than the available balance.':'Counted cash is less than the available balance.');
+}
+function resetCashCount(){for(const den of denominations)$('den'+den).value=0;calculateCashCount()}
+function calculateTxCash(){let total=0;for(const den of denominations)total+=den*Math.max(0,Math.floor(Number($('txden'+den)?.value)||0));if($('txCashTotal'))$('txCashTotal').textContent=money(total);return total}
+function useTxCashTotal(){const total=calculateTxCash();if(total<=0){alert('Enter at least one note or coin quantity.');return} $('amount').value=total.toFixed(2)}
+
+
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function setOpening(){const n=Number($('openingInput').value);if(!Number.isFinite(n)||n<0){alert('Enter a valid opening balance.');return}if(!confirm('Save opening balance as '+money(n)+'?'))return;data.opening=n;persist()}
+function save(buttonKind){const kind=buttonKind||$('kind').value;const amount=Number($('amount').value);
+ if(!Number.isFinite(amount)||amount<=0){alert('Please enter an amount greater than zero.');return}
+ const date=$('date').value;if(!date){alert('Please select date and time.');return}
+ if(!$('person').value.trim()){alert(kind==='paid'?'Please enter who the money was paid to.':'Please enter who the money was received from.');return}
+ if(!$('description').value.trim()){alert(kind==='paid'?'Please enter why the money was paid.':'Please enter why the money was received.');return}
+ const tx={id:editing||String(Date.now())+Math.random().toString(16).slice(2),kind,amount,person:$('person').value.trim(),description:$('description').value.trim(),date,cashBreakdown:Object.fromEntries(denominations.map(d=>[d,Math.max(0,Math.floor(Number($('txden'+d)?.value)||0))])),created:editing?(data.transactions.find(t=>t.id===editing)||{}).created||Date.now():Date.now()};
+ if(editing)data.transactions=data.transactions.map(t=>t.id===editing?tx:t);else data.transactions.push(tx);
+ resetForm();persist()
+}
+function resetForm(){editing=null;$('amount').value='';$('person').value='';$('description').value='';$('date').value=nowLocal();$('kind').value='received';for(const den of denominations){if($('txden'+den))$('txden'+den).value=0}calculateTxCash();$('formTitle').textContent='＋ New Transaction';$('cancelEdit').style.display='none'}
+function editTx(id){const t=data.transactions.find(x=>x.id===id);if(!t)return;editing=id;$('kind').value=t.kind;$('amount').value=t.amount;$('person').value=t.person;$('description').value=t.description;$('date').value=t.date;for(const den of denominations){if($('txden'+den))$('txden'+den).value=(t.cashBreakdown||{})[den]||0}calculateTxCash();$('formTitle').textContent='Edit Transaction';$('cancelEdit').style.display='block';window.scrollTo({top:0,behavior:'smooth'})}
+function deleteTx(id){if(!confirm('Delete this transaction? This will recalculate the running balance.'))return;data.transactions=data.transactions.filter(t=>t.id!==id);if(editing===id)resetForm();persist()}
+function applyFilters(){activeFilters={from:$('filterFrom').value,to:$('filterTo').value,kind:$('filterType').value,person:$('filterPerson').value.trim(),text:$('filterText').value.trim()};render()}
+function clearFilters(){$('filterFrom').value=cutoffDate();$('filterTo').value=today();$('filterType').value='all';$('filterPerson').value='';$('filterText').value='';activeFilters={from:$('filterFrom').value,to:$('filterTo').value,kind:'all',person:'',text:''};render()}
+function printHistory(){
+  const title='Cash Manager - Transaction History';
+  const filterSummary=[
+    activeFilters.from?'From: '+activeFilters.from:'',
+    activeFilters.to?'To: '+activeFilters.to:'',
+    activeFilters.kind!=='all'?'Type: '+activeFilters.kind:'',
+    activeFilters.person?'Person: '+activeFilters.person:'',
+    activeFilters.text?'Reason: '+activeFilters.text:''
+  ].filter(Boolean).join(' | ');
+  const oldTitle=document.title;
+  document.title=title;
+  const summary=document.createElement('div');
+  summary.id='printSummary';
+  summary.style.cssText='display:none';
+  summary.innerHTML='<h2>'+esc(title)+'</h2><p>Generated: '+esc(new Date().toLocaleString('en-IN'))+'</p><p>Filters: '+esc(filterSummary||'All retained history (last six months)')+'</p><p>Opening Balance: '+esc(money(data.opening))+' | Closing Balance: '+esc(money(totals().in+Number(data.opening)-totals().out))+'</p>';
+  document.querySelector('main').prepend(summary);
+  const style=document.createElement('style');style.id='printSummaryStyle';style.textContent='@media print{#printSummary{display:block!important} #printSummary h2{margin:0 0 8px}}';
+  document.head.appendChild(style);
+  window.onafterprint=()=>{summary.remove();style.remove();document.title=oldTitle;window.onafterprint=null};
+  window.print();
+}
+function showAll(){clearFilters()}
+function exportCSV(){const ts=sorted();let bal=Number(data.opening)||0;const lines=[['Date & Time','Type','Person / Paid To or Received From','Reason / Purpose','Received','Paid','Balance After Transaction']];
+ const allowed=new Set();let calc=Number(data.opening)||0;for(const t of ts){calc+=t.kind==='received'?Number(t.amount):-Number(t.amount);const day=String(t.date).slice(0,10);const match=(!activeFilters.from||day>=activeFilters.from)&&(!activeFilters.to||day<=activeFilters.to)&&(activeFilters.kind==='all'||t.kind===activeFilters.kind)&&(!activeFilters.person||String(t.person||'').toLowerCase().includes(activeFilters.person.toLowerCase()))&&(!activeFilters.text||(String(t.description||'').toLowerCase().includes(activeFilters.text.toLowerCase())||String(t.person||'').toLowerCase().includes(activeFilters.text.toLowerCase())));if(match)allowed.add(t.id)}
+ for(const t of ts){const inc=t.kind==='received'?Number(t.amount):0,out=t.kind==='paid'?Number(t.amount):0;bal+=inc-out;if(allowed.has(t.id))lines.push([t.date,t.kind,t.person,t.description,inc,out,bal.toFixed(2)])}
+ const csv=lines.map(row=>row.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\r\n');
+ const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='cash-manager-'+today()+'.csv';a.click();URL.revokeObjectURL(url)}
+$('kind').addEventListener('change',()=>{});for(const den of denominations){$('den'+den).addEventListener('input',calculateCashCount);const tx=$('txden'+den);if(tx)tx.addEventListener('input',calculateTxCash)}load();calculateTxCash();
+</script>
+</body></html>
