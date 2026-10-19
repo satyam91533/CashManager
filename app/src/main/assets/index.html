@@ -185,7 +185,7 @@ function useTxCashTotal(){const total=calculateTxCash();if(total<=0){alert('Ente
 
 
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function setOpening(){const n=Number($('openingInput').value);if(!Number.isFinite(n)||n<0){alert('Enter a valid opening balance.');return}if(!confirm('Save opening balance as '+money(n)+'?'))return;data.opening=n;persist()}
+function setOpening(){const raw=$('openingInput').value;const n=Number(raw);if(raw.trim()===''||!Number.isFinite(n)||n<0){alert('Enter a valid opening balance.');return}data.opening=n;persist();alert('Opening balance saved successfully!')}
 function save(buttonKind){const kind=buttonKind||$('kind').value;const amount=Number($('amount').value);
  if(!Number.isFinite(amount)||amount<=0){alert('Please enter an amount greater than zero.');return}
  const date=$('date').value;if(!date){alert('Please select date and time.');return}
@@ -220,8 +220,14 @@ function printHistory(){
   document.querySelector('main').prepend(summary);
   const style=document.createElement('style');style.id='printSummaryStyle';style.textContent='@media print{#printSummary{display:block!important} #printSummary h2{margin:0 0 8px}}';
   document.head.appendChild(style);
-  window.onafterprint=()=>{summary.remove();style.remove();document.title=oldTitle;window.onafterprint=null};
-  window.print();
+  const cleanup=()=>{summary.remove();style.remove();document.title=oldTitle;window.onafterprint=null};
+  window.onafterprint=cleanup;
+  if(window.AndroidPrint && typeof AndroidPrint.printPage==='function'){
+    AndroidPrint.printPage();
+    setTimeout(cleanup,10000);
+  }else{
+    window.print();
+  }
 }
 function showAll(){clearFilters()}
 function exportCSV(){const ts=sorted();let bal=Number(data.opening)||0;const lines=[['Date & Time','Type','Person / Paid To or Received From','Reason / Purpose','Received','Paid','Balance After Transaction']];
