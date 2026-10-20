@@ -208,8 +208,10 @@ details.collapsible:not([open])>.inside{display:block!important}
 </nav>
 <script>
 
-function showPanel(id){$('dashboard').classList.add('hidden');document.querySelectorAll('.screen-panel').forEach(p=>p.classList.toggle('active',p.id===id));document.querySelectorAll('.bottom-nav button').forEach(b=>b.classList.remove('active'));window.scrollTo({top:0,behavior:'smooth'})}
-function backHome(){document.querySelectorAll('.screen-panel').forEach(p=>p.classList.remove('active'));$('dashboard').classList.remove('hidden');document.querySelectorAll('.bottom-nav button').forEach((b,i)=>b.classList.toggle('active',i===0));window.scrollTo({top:0,behavior:'smooth'})}
+let currentScreen='home';
+function showPanel(id){if(currentScreen!==id){history.pushState({cashScreen:id},'','#'+id);currentScreen=id}$('dashboard').classList.add('hidden');document.querySelectorAll('.screen-panel').forEach(p=>p.classList.toggle('active',p.id===id));document.querySelectorAll('.bottom-nav button').forEach(b=>b.classList.remove('active'));window.scrollTo({top:0,behavior:'smooth'})}
+function backHome(fromPop=false){if(!fromPop&&currentScreen!=='home'&&history.state&&history.state.cashScreen){history.back();return}currentScreen='home';document.querySelectorAll('.screen-panel').forEach(p=>p.classList.remove('active'));$('dashboard').classList.remove('hidden');document.querySelectorAll('.bottom-nav button').forEach((b,i)=>b.classList.toggle('active',i===0));window.scrollTo({top:0,behavior:'smooth'})}
+window.addEventListener('popstate',()=>{const id=location.hash.slice(1);if(id&&$(id)&&$(id).classList.contains('screen-panel')){currentScreen=id;$('dashboard').classList.add('hidden');document.querySelectorAll('.screen-panel').forEach(p=>p.classList.toggle('active',p.id===id))}else{backHome(true)}});
 function focusTransaction(kind){$('kind').value=kind;showPanel('transactionPanel');$('formTitle').textContent=kind==='received'?'＋ Add Received':'− Add Paid';$('amount').focus()}
 function openOpening(){showPanel('openingPanel')}
 function openHistory(){showPanel('historyPanel')}
