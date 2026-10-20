@@ -79,7 +79,7 @@ main{padding:12px 12px 88px}
 </style>
 </head>
 <body>
-<header><button id="settingsGear" onclick="openSettings()" aria-label="Settings">⚙</button><h1>💰 Cash Manager</h1><p>Your daily cash book · Works offline</p><div class="balance-label">CURRENT CLOSING BALANCE</div><div class="balance" id="balance">₹0.00</div></header>
+<header><h1>💰 Cash Manager</h1><p>Your daily cash book · Works offline</p><div class="balance-label">CURRENT CLOSING BALANCE</div><div class="balance" id="balance">₹0.00</div></header>
 <main>
 <div class="home-shortcuts">
 <button onclick="focusTransaction('received')"><span class="shortcut-icon">⬇️</span><span>Received</span></button>
@@ -89,7 +89,7 @@ main{padding:12px 12px 88px}
 <button onclick="openReports()"><span class="shortcut-icon">📊</span><span>Reports</span></button>
 <button onclick="printHistory()"><span class="shortcut-icon">🖨️</span><span>Print / Save PDF</span></button>
 <button onclick="exportCSV()"><span class="shortcut-icon">📄</span><span>Export CSV</span></button>
-<button onclick="openSettings()"><span class="shortcut-icon">⚙️</span><span>More / Settings</span></button>
+<button onclick="openSettings()"><span class="shortcut-icon">☰</span><span>More</span></button>
 </div>
 <div class="cards">
 <div class="card"><small>Opening Balance</small><strong id="opening">₹0.00</strong></div>
@@ -158,23 +158,7 @@ main{padding:12px 12px 88px}
 <p class="note">Transactions are kept for the last 6 months. Search by name, date, or reason.</p>
 </div></details>
 
-<details class="section collapsible" id="appSettings">
-<summary>⚙️ App Settings & Logo</summary><div class="inside">
-<p class="note">Choose a simple shortcut icon for your phone Home Screen, or use your own image.</p>
-<label for="appShortcutName">Shortcut name</label><input id="appShortcutName" maxlength="30" value="Cash Manager" placeholder="Cash Manager">
-<label>Choose a ready-made icon</label>
-<div class="actions">
-<button class="neutral" onclick="makePresetShortcut('💰','Cash Manager')">💰 Wallet</button>
-<button class="neutral" onclick="makePresetShortcut('🏪','My Shop')">🏪 Shop</button>
-<button class="neutral" onclick="makePresetShortcut('📒','Cash Book')">📒 Cash Book</button>
-<button class="neutral" onclick="makePresetShortcut('🟢','My Business')">🟢 Minimal</button>
-</div>
-<label for="customLogoFile">Or choose your own logo (PNG/JPG)</label><input id="customLogoFile" type="file" accept="image/png,image/jpeg,image/webp">
-<div id="logoPreviewWrap" style="display:none;text-align:center;margin-top:12px"><img id="logoPreview" alt="Custom logo preview" style="width:88px;height:88px;object-fit:cover;border-radius:20px;border:1px solid #e1e7ee"><p class="note">Logo preview</p></div>
-<button class="receive" style="width:100%;margin-top:10px" onclick="saveCustomShortcut()">Create Home Screen Shortcut</button>
-<button class="neutral" style="width:100%;margin-top:8px" onclick="resetLogoChoice()">Reset Logo Choice</button>
-<p class="note">Android creates a Home Screen shortcut; the installed app's original launcher icon itself cannot be replaced dynamically by a gallery image on all Android launchers.</p>
-</div></details>
+
 
 <p class="note" style="padding:6px 2px">Your data stays on this device. Clearing app data or uninstalling may erase it. Export CSV regularly as a backup. No data is sent online.</p>
 </main>
@@ -182,7 +166,7 @@ main{padding:12px 12px 88px}
 <button class="active" onclick="goHome()">⌂<br>Home</button>
 <button onclick="openHistory()">◷<br>History</button>
 <button onclick="openReports()">▥<br>Reports</button>
-<button onclick="openSettings()">☰<br>More</button>
+<button onclick="openMore()">☰<br>More</button>
 </nav>
 <script>
 
@@ -190,7 +174,7 @@ function focusTransaction(kind){$('kind').value=kind;document.querySelector('.se
 function openOpening(){const el=document.querySelector('summary')?.closest('details');const d=[...document.querySelectorAll('details')].find(x=>x.querySelector('summary')?.textContent.includes('Set Opening Balance'));if(d){d.open=true;d.scrollIntoView({behavior:'smooth',block:'start'})}}
 function openHistory(){const d=[...document.querySelectorAll('details')].find(x=>x.querySelector('summary')?.textContent.includes('History & Reports'));if(d){d.open=true;d.scrollIntoView({behavior:'smooth',block:'start'})}}
 function openReports(){openHistory();setTimeout(()=>document.getElementById('history')?.scrollIntoView({behavior:'smooth',block:'start'}),200)}
-function openSettings(){const d=$('appSettings');if(d){d.open=true;d.scrollIntoView({behavior:'smooth',block:'start'})}}
+function openMore(){const d=[...document.querySelectorAll('details')].find(x=>x.querySelector('summary')?.textContent.includes('Cash Count'));if(d){d.open=true;d.scrollIntoView({behavior:'smooth',block:'start'})}else openHistory()}
 function goHome(){window.scrollTo({top:0,behavior:'smooth'});document.querySelectorAll('.bottom-nav button').forEach((b,i)=>b.classList.toggle('active',i===0))}
 
 const KEY='cashManager.v1';
@@ -298,12 +282,6 @@ function exportCSV(){if(!confirm('Export the currently filtered history to a CSV
  for(const t of ts){const inc=t.kind==='received'?Number(t.amount):0,out=t.kind==='paid'?Number(t.amount):0;bal+=inc-out;if(allowed.has(t.id))lines.push([t.date,t.kind,t.person,t.description,inc,out,bal.toFixed(2)])}
  const csv=lines.map(row=>row.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\r\n');
  const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='cash-manager-'+today()+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);alert('CSV export started successfully!')}
-
-let selectedLogoData='';
-function makePresetShortcut(emoji,label){const name=$('appShortcutName').value.trim()||label;const canvas=document.createElement('canvas');canvas.width=256;canvas.height=256;const ctx=canvas.getContext('2d');ctx.fillStyle='#16834a';ctx.fillRect(0,0,256,256);ctx.font='150px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(emoji,128,132);const data=canvas.toDataURL('image/png').split(',')[1];if(window.AndroidPrint&&AndroidPrint.createHomeShortcut){AndroidPrint.createHomeShortcut(name,data);alert('Shortcut request sent. Check your Home Screen.')}else alert('Shortcut creation is available in the Android app only.')}
-$('customLogoFile')?.addEventListener('change',function(){const file=this.files&&this.files[0];if(!file)return;if(file.size>3*1024*1024){alert('Please choose an image smaller than 3 MB.');this.value='';return}const reader=new FileReader();reader.onload=()=>{selectedLogoData=String(reader.result||'').split(',')[1]||'';$('logoPreview').src=String(reader.result);$('logoPreviewWrap').style.display='block'};reader.readAsDataURL(file)});
-function saveCustomShortcut(){if(!selectedLogoData){alert('Please choose a logo image first.');return}if(!window.AndroidPrint||!AndroidPrint.createHomeShortcut){alert('Shortcut creation is available in the Android app only.');return}const name=$('appShortcutName').value.trim()||'Cash Manager';AndroidPrint.createHomeShortcut(name,selectedLogoData);alert('Custom shortcut request sent. Check your Home Screen.')}
-function resetLogoChoice(){selectedLogoData='';$('customLogoFile').value='';$('logoPreview').removeAttribute('src');$('logoPreviewWrap').style.display='none';$('appShortcutName').value='Cash Manager';alert('Logo choice reset. Existing shortcuts may need to be removed manually from Home Screen.')}
 
 $('kind').addEventListener('change',()=>{});for(const den of denominations){$('den'+den).addEventListener('input',calculateCashCount);const tx=$('txden'+den);if(tx)tx.addEventListener('input',calculateTxCash)}load();calculateTxCash();
 </script>
