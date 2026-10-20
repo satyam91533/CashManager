@@ -212,7 +212,8 @@ function focusTransaction(kind){$('kind').value=kind;document.querySelector('.se
 function openOpening(){const el=document.querySelector('summary')?.closest('details');const d=[...document.querySelectorAll('details')].find(x=>x.querySelector('summary')?.textContent.includes('Set Opening Balance'));if(d){d.open=true;d.scrollIntoView({behavior:'smooth',block:'start'})}}
 function openHistory(){const d=[...document.querySelectorAll('details')].find(x=>x.querySelector('summary')?.textContent.includes('History & Reports'));if(d){d.open=true;d.scrollIntoView({behavior:'smooth',block:'start'})}}
 function openReports(){openHistory();setTimeout(()=>document.getElementById('history')?.scrollIntoView({behavior:'smooth',block:'start'}),200)}
-function openCashCount(){const d=[...document.querySelectorAll("details")].find(x=>x.id==="cashCountSection");if(d){d.open=true;d.scrollIntoView({behavior:"smooth",block:"start"})}}\nfunction openMore(){const d=[...document.querySelectorAll('details')].find(x=>x.querySelector('summary')?.textContent.includes('Cash Count'));if(d){d.open=true;d.scrollIntoView({behavior:'smooth',block:'start'})}else openHistory()}
+function openCashCount(){const d=[...document.querySelectorAll("details")].find(x=>x.id==="cashCountSection");if(d){d.open=true;d.scrollIntoView({behavior:"smooth",block:"start"})}}
+function openMore(){const d=[...document.querySelectorAll('details')].find(x=>x.querySelector('summary')?.textContent.includes('Cash Count'));if(d){d.open=true;d.scrollIntoView({behavior:'smooth',block:'start'})}else openHistory()}
 function goHome(){window.scrollTo({top:0,behavior:'smooth'});document.querySelectorAll('.bottom-nav button').forEach((b,i)=>b.classList.toggle('active',i===0))}
 
 const KEY='cashManager.v1';
