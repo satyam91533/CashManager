@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application android:theme="@android:style/Theme.Material.Light.NoActionBar"
-        android:label="Cash Manager" android:usesCleartextTraffic="false">
+        android:label="Cash Manager" android:icon="@drawable/ic_cash_manager" android:usesCleartextTraffic="false">
         <activity android:name=".MainActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
