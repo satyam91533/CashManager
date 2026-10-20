@@ -37,6 +37,14 @@ public class MainActivity extends Activity {
         web.loadUrl("file:///android_asset/index.html");
     }
 
+    @Override public void onBackPressed() {
+        if (web != null) {
+            web.evaluateJavascript("if (typeof currentScreen !== 'undefined' && currentScreen !== 'home') { history.back(); } else { backHome(true); }", null);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
     private class PrintBridge {
         @JavascriptInterface
         public void createHomeShortcut(String label, String base64Png) {
