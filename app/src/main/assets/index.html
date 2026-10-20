@@ -127,7 +127,7 @@ details.collapsible:not([open])>.inside{display:block!important}
 <button onclick="openReports()"><span class="shortcut-icon">📊</span><span>Reports</span></button>
 <button onclick="printHistory()"><span class="shortcut-icon">🖨️</span><span>Print / Save PDF</span></button>
 <button onclick="exportCSV()"><span class="shortcut-icon">📄</span><span>Export CSV</span></button>
-<button onclick="openCashCount()"><span class="shortcut-icon">🪙</span><span>Cash Count</span></button>
+<button onclick="openCashCount()"><span class="shortcut-icon">🧮</span><span>Cash Count</span></button>
 </div>
 <div class="cards">
 <div class="card"><small>Opening Balance</small><strong id="opening">₹0.00</strong></div>
@@ -135,13 +135,13 @@ details.collapsible:not([open])>.inside{display:block!important}
 <div class="card"><small>Total Paid</small><strong class="red" id="totalOut">₹0.00</strong></div>
 <div class="card"><small>Transactions</small><strong id="count">0</strong></div>
 </div>
-<details class="section collapsible">
-<summary>⚙️ Set Opening Balance</summary><div class="inside">
+<section class="section">
+<h2>⚙️ Set Opening Balance</h2><div class="inside">
 <label for="openingInput">Opening cash amount (₹)</label>
 <input id="openingInput" type="number" min="0" step="0.01" placeholder="e.g. 10000">
 <button class="neutral" style="width:100%;margin-top:10px" onclick="setOpening()">Save Opening Balance</button>
 <p class="note">Set this once to start. Your balance updates automatically.</p>
-</div></details>
+</div></section>
 <section class="section">
 <h2 id="formTitle">＋ New Transaction</h2>
 <div class="row">
@@ -153,12 +153,12 @@ details.collapsible:not([open])>.inside{display:block!important}
 <div><label for="date">Date & Time</label><input id="date" type="datetime-local" required></div>
 </div>
 <label for="description" id="reasonLabel">Reason / Purpose</label><input id="description" maxlength="160" placeholder="e.g. shop rent, groceries, loan" required>
-<details class="collapsible" style="border:1px solid #dce9e6;border-radius:13px;margin-top:12px"><summary>🪙 Count notes / coins (optional)</summary><div class="inside"><p class="note">Enter the quantity of each denomination. Tap “Use Total” to fill the transaction amount.</p><div class="row"><div><label for="txden500">₹500 notes / coins</label><input id="txden500" type="number" min="0" step="1" value="0" inputmode="numeric"></div><div><label for="txden200">₹200 notes / coins</label><input id="txden200" type="number" min="0" step="1" value="0" inputmode="numeric"></div><div><label for="txden100">₹100 notes / coins</label><input id="txden100" type="number" min="0" step="1" value="0" inputmode="numeric"></div><div><label for="txden50">₹50 notes / coins</label><input id="txden50" type="number" min="0" step="1" value="0" inputmode="numeric"></div><div><label for="txden20">₹20 notes / coins</label><input id="txden20" type="number" min="0" step="1" value="0" inputmode="numeric"></div><div><label for="txden10">₹10 notes / coins</label><input id="txden10" type="number" min="0" step="1" value="0" inputmode="numeric"></div><div><label for="txden5">₹5 notes / coins</label><input id="txden5" type="number" min="0" step="1" value="0" inputmode="numeric"></div><div><label for="txden2">₹2 notes / coins</label><input id="txden2" type="number" min="0" step="1" value="0" inputmode="numeric"></div><div><label for="txden1">₹1 notes / coins</label><input id="txden1" type="number" min="0" step="1" value="0" inputmode="numeric"></div></div><div class="card" style="margin-top:10px"><small>Cash Total</small><strong id="txCashTotal">₹0.00</strong></div><button class="neutral" style="width:100%;margin-top:10px" onclick="useTxCashTotal()">Use Total as Amount</button></div></details><div class="actions"><button class="receive" onclick="save('received')">＋ Save Received</button><button class="paid" onclick="save('paid')">− Save Paid</button></div>
+<section class="collapsible" style="border:1px solid #dce9e6;border-radius:13px;margin-top:12px"><h2>🪙 Count notes / coins (optional)</h2><div class="inside"><p class="note">Enter the quantity of each denomination. Tap “Use Total” to fill the transaction amount.</p><div class="row"><div><label for="txden500">₹500 notes / coins</label><input id="txden500" type="number" min="0" step="1" value="0" inputmode="numeric"></div><div><label for="txden200">₹200 notes / coins</label><input id="txden200" type="number" min="0" step="1" value="0" inputmode="numeric"></div><div><label for="txden100">₹100 notes / coins</label><input id="txden100" type="number" min="0" step="1" value="0" inputmode="numeric"></div><div><label for="txden50">₹50 notes / coins</label><input id="txden50" type="number" min="0" step="1" value="0" inputmode="numeric"></div><div><label for="txden20">₹20 notes / coins</label><input id="txden20" type="number" min="0" step="1" value="0" inputmode="numeric"></div><div><label for="txden10">₹10 notes / coins</label><input id="txden10" type="number" min="0" step="1" value="0" inputmode="numeric"></div><div><label for="txden5">₹5 notes / coins</label><input id="txden5" type="number" min="0" step="1" value="0" inputmode="numeric"></div><div><label for="txden2">₹2 notes / coins</label><input id="txden2" type="number" min="0" step="1" value="0" inputmode="numeric"></div><div><label for="txden1">₹1 notes / coins</label><input id="txden1" type="number" min="0" step="1" value="0" inputmode="numeric"></div></div><div class="card" style="margin-top:10px"><small>Cash Total</small><strong id="txCashTotal">₹0.00</strong></div><button class="neutral" style="width:100%;margin-top:10px" onclick="useTxCashTotal()">Use Total as Amount</button></div></section><div class="actions"><button class="receive" onclick="save('received')">＋ Save Received</button><button class="paid" onclick="save('paid')">− Save Paid</button></div>
 <button id="cancelEdit" class="neutral" style="display:none;width:100%;margin-top:8px" onclick="resetForm()">Cancel Edit</button>
 </section>
 
-<details class="section collapsible" id="cashCountSection">
-<summary>🪙 Cash Count</summary><div class="inside">
+<section class="section" id="cashCountSection">
+<h2>🪙 Cash Count</h2><div class="inside">
 <p class="note">Enter the quantity of each note or coin. Total cash, available balance, and difference update automatically.</p>
 <div class="row">
 <div><label for="den500">₹500 × Quantity</label><input id="den500" type="number" min="0" step="1" value="0" inputmode="numeric"></div>
@@ -175,10 +175,10 @@ details.collapsible:not([open])>.inside{display:block!important}
 <div class="card" style="margin-top:10px"><small>Available Balance (ledger)</small><strong id="availableCash">₹0.00</strong></div>
 <div class="card" style="margin-top:10px"><small>Difference (Cash Count − Available Balance)</small><strong id="cashDifference">₹0.00</strong><small id="differenceNote">Cash count and ledger balance match.</small></div>
 <button class="neutral" style="width:100%;margin-top:12px" onclick="resetCashCount()">Reset Count</button>
-</div></details>
+</div></section>
 
-<details class="section collapsible">
-<summary>📒 History & Reports</summary><div class="inside">
+<section class="section">
+<h2>📒 History & Reports</h2><div class="inside">
 <h2>Transaction History (Last 6 Months)</h2>
 <div class="row">
 <div><label for="filterFrom">From date</label><input id="filterFrom" type="date"></div>
@@ -194,7 +194,7 @@ details.collapsible:not([open])>.inside{display:block!important}
 <div style="margin-bottom:12px"><button class="neutral" style="width:100%" onclick="showAll()">Show All (6 months)</button></div>
 <div id="history"></div>
 <p class="note">Transactions are kept for the last 6 months. Search by name, date, or reason.</p>
-</div></details>
+</div></section>
 
 
 
@@ -209,11 +209,12 @@ details.collapsible:not([open])>.inside{display:block!important}
 <script>
 
 function focusTransaction(kind){$('kind').value=kind;document.querySelector('.section:not(.collapsible)').scrollIntoView({behavior:'smooth',block:'start'});$('amount').focus()}
-function openOpening(){const el=document.querySelector('summary')?.closest('details');const d=[...document.querySelectorAll('details')].find(x=>x.querySelector('summary')?.textContent.includes('Set Opening Balance'));if(d){d.open=true;d.scrollIntoView({behavior:'smooth',block:'start'})}}
-function openHistory(){const d=[...document.querySelectorAll('details')].find(x=>x.querySelector('summary')?.textContent.includes('History & Reports'));if(d){d.open=true;d.scrollIntoView({behavior:'smooth',block:'start'})}}
+function scrollToSection(el){if(el)el.scrollIntoView({behavior:'smooth',block:'start'})}
+function openOpening(){scrollToSection([...document.querySelectorAll('.section')].find(x=>x.querySelector('h2')?.textContent.includes('Set Opening Balance')))}
+function openHistory(){scrollToSection([...document.querySelectorAll('.section')].find(x=>x.querySelector('h2')?.textContent.includes('History & Reports')))}
 function openReports(){openHistory();setTimeout(()=>document.getElementById('history')?.scrollIntoView({behavior:'smooth',block:'start'}),200)}
-function openCashCount(){const d=[...document.querySelectorAll("details")].find(x=>x.id==="cashCountSection");if(d){d.open=true;d.scrollIntoView({behavior:"smooth",block:"start"})}}
-function openMore(){const d=[...document.querySelectorAll('details')].find(x=>x.querySelector('summary')?.textContent.includes('Cash Count'));if(d){d.open=true;d.scrollIntoView({behavior:'smooth',block:'start'})}else openHistory()}
+function openCashCount(){scrollToSection(document.getElementById('cashCountSection'))}
+function openMore(){openCashCount()}
 function goHome(){window.scrollTo({top:0,behavior:'smooth'});document.querySelectorAll('.bottom-nav button').forEach((b,i)=>b.classList.toggle('active',i===0))}
 
 const KEY='cashManager.v1';
@@ -225,7 +226,7 @@ const today=()=>nowLocal().slice(0,10);
 const displayDateTime=value=>{const d=new Date(value);return Number.isNaN(d.getTime())?String(value):d.toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'})};
 function cutoffDate(){const d=new Date();d.setMonth(d.getMonth()-6);d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,10)}
 function pruneOld(){const cutoff=cutoffDate();data.transactions=data.transactions.filter(t=>String(t.date).slice(0,10)>=cutoff)}
-function load(){document.querySelectorAll('details.collapsible').forEach(d=>d.open=true);try{const s=localStorage.getItem(KEY);if(s)data=JSON.parse(s)}catch(e){};if(!Array.isArray(data.transactions))data.transactions=[];pruneOld();$('date').value=nowLocal();$('openingInput').value=data.opening;$('filterFrom').value=cutoffDate();$('filterTo').value=today();persist()}
+function load(){try{const s=localStorage.getItem(KEY);if(s)data=JSON.parse(s)}catch(e){};if(!Array.isArray(data.transactions))data.transactions=[];pruneOld();$('date').value=nowLocal();$('openingInput').value=data.opening;$('filterFrom').value=cutoffDate();$('filterTo').value=today();persist()}
 function persist(){pruneOld();localStorage.setItem(KEY,JSON.stringify(data));render()}
 function sorted(){return [...data.transactions].sort((a,b)=>a.date.localeCompare(b.date)||a.created-b.created)}
 function totals(){return data.transactions.reduce((o,t)=>{o[t.kind==='received'?'in':'out']+=Number(t.amount);return o},{in:0,out:0})}
