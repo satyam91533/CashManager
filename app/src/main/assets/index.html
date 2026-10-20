@@ -149,10 +149,10 @@ details.collapsible:not([open])>.inside{display:block!important}
 <div><label for="amount">Total Amount (₹)</label><input id="amount" type="number" min="0.01" step="0.01" placeholder="0.00"></div>
 </div>
 <div class="row">
-<div><label for="person" id="personLabel">Person / Name</label><input id="person" maxlength="80" placeholder="Enter person name" required></div>
+<div><label for="person" id="personLabel">Person / Name (optional)</label><input id="person" maxlength="80" placeholder="Enter person name" required></div>
 <div><label for="date">Date & Time</label><input id="date" type="datetime-local" required></div>
 </div>
-<label for="description" id="reasonLabel">Reason / Purpose</label><input id="description" maxlength="160" placeholder="e.g. shop rent, groceries, loan" required>
+<label for="description" id="reasonLabel">Reason / Purpose (optional)</label><input id="description" maxlength="160" placeholder="e.g. shop rent, groceries, loan" required>
 <section class="collapsible" style="border:1px solid #dce9e6;border-radius:13px;margin-top:12px"><h2>🪙 Count notes / coins (optional)</h2><div class="inside"><p class="note">Enter the quantity of each denomination. Tap “Use Total” to fill the transaction amount.</p><div class="row"><div><label for="txden500">₹500 notes / coins</label><input id="txden500" type="number" min="0" step="1" value="0" inputmode="numeric"></div><div><label for="txden200">₹200 notes / coins</label><input id="txden200" type="number" min="0" step="1" value="0" inputmode="numeric"></div><div><label for="txden100">₹100 notes / coins</label><input id="txden100" type="number" min="0" step="1" value="0" inputmode="numeric"></div><div><label for="txden50">₹50 notes / coins</label><input id="txden50" type="number" min="0" step="1" value="0" inputmode="numeric"></div><div><label for="txden20">₹20 notes / coins</label><input id="txden20" type="number" min="0" step="1" value="0" inputmode="numeric"></div><div><label for="txden10">₹10 notes / coins</label><input id="txden10" type="number" min="0" step="1" value="0" inputmode="numeric"></div><div><label for="txden5">₹5 notes / coins</label><input id="txden5" type="number" min="0" step="1" value="0" inputmode="numeric"></div><div><label for="txden2">₹2 notes / coins</label><input id="txden2" type="number" min="0" step="1" value="0" inputmode="numeric"></div><div><label for="txden1">₹1 notes / coins</label><input id="txden1" type="number" min="0" step="1" value="0" inputmode="numeric"></div></div><div class="card" style="margin-top:10px"><small>Cash Total</small><strong id="txCashTotal">₹0.00</strong></div><button class="neutral" style="width:100%;margin-top:10px" onclick="useTxCashTotal()">Use Total as Amount</button></div></section><div class="actions"><button class="receive" onclick="save('received')">＋ Save Received</button><button class="paid" onclick="save('paid')">− Save Paid</button></div>
 <button id="cancelEdit" class="neutral" style="display:none;width:100%;margin-top:8px" onclick="resetForm()">Cancel Edit</button>
 </section>
@@ -278,13 +278,12 @@ function setOpening(){const raw=$('openingInput').value;const n=Number(raw);if(r
 function save(buttonKind){const kind=buttonKind||$('kind').value;const amount=Number($('amount').value);
  if(!Number.isFinite(amount)||amount<=0){alert('Please enter an amount greater than zero.');return}
  const date=$('date').value;if(!date){alert('Please select date and time.');return}
- if(!$('person').value.trim()){alert(kind==='paid'?'Please enter who the money was paid to.':'Please enter who the money was received from.');return}
- if(!$('description').value.trim()){alert(kind==='paid'?'Please enter why the money was paid.':'Please enter why the money was received.');return}
- const tx={id:editing||String(Date.now())+Math.random().toString(16).slice(2),kind,amount,person:$('person').value.trim(),description:$('description').value.trim(),date,cashBreakdown:Object.fromEntries(denominations.map(d=>[d,Math.max(0,Math.floor(Number($('txden'+d)?.value)||0))])),created:editing?(data.transactions.find(t=>t.id===editing)||{}).created||Date.now():Date.now()};
+ const tx={id:editing||String(Date.now())+Math.random().toString(16).slice(2),kind,amount,person:$('person').value.trim()||'Not specified',description:$('description').value.trim(),date,cashBreakdown:Object.fromEntries(denominations.map(d=>[d,Math.max(0,Math.floor(Number($('txden'+d)?.value)||0))])),created:editing?(data.transactions.find(t=>t.id===editing)||{}).created||Date.now():Date.now()};
  const wasEditing=Boolean(editing);
  if(wasEditing)data.transactions=data.transactions.map(t=>t.id===editing?tx:t);else data.transactions.push(tx);
- resetForm();persist();
- alert(wasEditing?'Transaction updated successfully!':(kind==='received'?'Money received successfully!':'Payment saved successfully!'));
+ resetForm();
+ try{persist();showPanel('historyPanel');alert(wasEditing?'Transaction updated successfully!':(kind==='received'?'Money received successfully!':'Payment saved successfully!'))}
+ catch(e){alert('Could not save transaction on this device. Please check app storage and try again. Error: '+e.message)}
 }
 function resetForm(){editing=null;$('amount').value='';$('person').value='';$('description').value='';$('date').value=nowLocal();$('kind').value='received';for(const den of denominations){if($('txden'+den))$('txden'+den).value=0}calculateTxCash();$('formTitle').textContent='＋ New Transaction';$('cancelEdit').style.display='none'}
 function editTx(id){const t=data.transactions.find(x=>x.id===id);if(!t)return;editing=id;$('kind').value=t.kind;$('amount').value=t.amount;$('person').value=t.person;$('description').value=t.description;$('date').value=t.date;for(const den of denominations){if($('txden'+den))$('txden'+den).value=(t.cashBreakdown||{})[den]||0}calculateTxCash();$('formTitle').textContent='Edit Transaction';$('cancelEdit').style.display='block';window.scrollTo({top:0,behavior:'smooth'})}
