@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#16834a">
+<meta name="description" content="Cash Manager — track received and paid cash, opening balance, transaction history, cash count and export reports.">
+<title>Cash Manager — Simple Cash Book</title>
+<style>
+:root{color-scheme:light;--green:#16834a;--ink:#17231c;--muted:#617067;--line:#e3ebe5;--bg:#f5f8f5}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header{padding:18px max(20px,calc((100% - 1040px)/2));display:flex;align-items:center;gap:12px;background:#fff;border-bottom:1px solid var(--line)}
+.logo{width:44px;height:44px;border-radius:14px;background:var(--green);display:grid;place-items:center;color:#fff;font-size:25px;font-weight:800}header strong{font-size:19px}header small{display:block;color:var(--muted);font-size:12px}
+main{max-width:1040px;margin:auto;padding:48px 20px}.hero{display:grid;grid-template-columns:1.2fr .8fr;gap:34px;align-items:center}
+.tag{display:inline-block;background:#e1f4e7;color:#116637;border-radius:99px;padding:5px 12px;font-size:13px;font-weight:700}
+h1{font-size:clamp(36px,6vw,58px);line-height:1.08;letter-spacing:-1.8px;margin:18px 0}p{color:var(--muted)}.btn{display:inline-block;margin:10px 8px 0 0;background:var(--green);color:white;padding:13px 20px;border-radius:12px;text-decoration:none;font-weight:750}.btn.secondary{background:#fff;color:var(--green);border:1px solid #b9d8c3}
+.panel{background:#fff;border:1px solid var(--line);border-radius:22px;padding:24px;box-shadow:0 14px 45px #12351b0a}.balance{background:#e8f7ec;border-radius:16px;padding:18px;margin-bottom:14px}.balance small{color:var(--muted)}.balance strong{display:block;font-size:32px}.stats{display:grid;grid-template-columns:1fr 1fr;gap:12px}.stat{border:1px solid var(--line);border-radius:14px;padding:15px}.stat strong{display:block;font-size:20px}.green{color:#16834a}.red{color:#d34545}
+section{margin-top:54px}h2{font-size:27px;letter-spacing:-.5px}.features{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.feature{background:#fff;border:1px solid var(--line);border-radius:17px;padding:20px}.feature b{display:block;margin:8px 0}.icon{font-size:25px}
+footer{border-top:1px solid var(--line);padding:25px 20px;text-align:center;color:var(--muted);font-size:13px}footer a{color:var(--green)}
+.notice{font-size:13px;background:#fff8df;border:1px solid #f2e5ac;padding:12px 14px;border-radius:12px;color:#705a17;margin-top:16px}
+@media(max-width:720px){main{padding-top:30px}.hero{grid-template-columns:1fr}.features{grid-template-columns:1fr}.panel{max-width:520px}}
+</style></head>
+<body>
+<header><div class="logo">₹</div><div><strong>Cash Manager</strong><small>Your simple daily cash book</small></div></header>
+<main>
+<div class="hero"><div><span class="tag">Simple · Useful · Offline-first</span><h1>Keep your cash.<br><span style="color:var(--green)">Clear and organized.</span></h1>
+<p>Record money received and paid, track your running balance, and review your cash activity from one simple Android app.</p>
+<a class="btn" href="https://github.com/satyam91533/CashManager/releases/latest">Download Android APK</a>
+<a class="btn secondary" href="https://github.com/satyam91533/CashManager">View project</a>
+<div class="notice">If no APK is listed on the release page yet, the public download release has not been published. Only install APKs you trust.</div></div>
+<div class="panel"><div class="balance"><small>Running balance</small><strong>₹ 12,450.00</strong><small>Example preview</small></div><div class="stats"><div class="stat"><span class="green">↙ Received</span><strong>₹ 15,000</strong></div><div class="stat"><span class="red">↗ Paid</span><strong>₹ 2,550</strong></div></div><p style="font-size:13px;margin-bottom:0">Illustrative preview only — not live account data.</p></div></div>
+<section><h2>Everything for daily cash tracking</h2><div class="features">
+<div class="feature"><span class="icon">↔️</span><b>Received & Paid</b><p>Record incoming and outgoing cash and see the balance update.</p></div>
+<div class="feature"><span class="icon">🧾</span><b>History & reports</b><p>Review transactions with date filters and recent-month history.</p></div>
+<div class="feature"><span class="icon">📄</span><b>Export & print</b><p>Export records to CSV or print/save reports as PDF.</p></div>
+<div class="feature"><span class="icon">🪙</span><b>Cash count</b><p>Count notes and coins by denomination.</p></div>
+<div class="feature"><span class="icon">⚖️</span><b>Opening balance</b><p>Set your starting cash balance to begin tracking.</p></div>
+<div class="feature"><span class="icon">📱</span><b>Made for Android</b><p>A compact app experience designed for everyday use.</p></div>
+</div></section>
+<section><h2>Privacy and support</h2><p>Read the <a href="./privacy.html">Privacy Policy</a>. For help or to report an issue, use the <a href="https://github.com/satyam91533/CashManager/issues">project support page</a>.</p><p>Cash Manager is an independent project. Please review app permissions and keep your device backed up.</p></section>
+</main>
+<footer>© 2026 Cash Manager · <a href="./privacy.html">Privacy Policy</a> · <a href="https://github.com/satyam91533/CashManager/issues">Support</a></footer>
+</body></html>
