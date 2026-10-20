@@ -57,11 +57,40 @@ button{padding:12px;font-size:14px;min-height:44px}
 .helper{font-size:12px;color:#64716b;margin:5px 0 0}
 @media(max-width:380px){.row{grid-template-columns:1fr}.cards{grid-template-columns:1fr 1fr}.balance{font-size:29px}}
 @media print{.collapsible summary{display:none!important}.collapsible .inside{display:block!important;padding:0}}
+
+/* Reference-style home layout and working navigation */
+header{position:relative;padding:18px 16px 20px;background:#fff;color:#172033;border-bottom:1px solid #e7edf2}
+header h1{display:inline-block;vertical-align:middle;margin:0;font-size:23px}
+header p{margin:4px 0 14px}
+.balance-label{color:#64748b;font-weight:650}
+.balance{color:#16834a;font-size:32px}
+main{padding:12px 12px 88px}
+.cards{margin-top:0}
+.home-shortcuts{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}
+.home-shortcuts button{background:#fff;color:#243244;border:1px solid #e7edf2;box-shadow:0 2px 8px #18223008;text-align:left;display:flex;align-items:center;gap:10px;padding:14px 12px;min-height:62px}
+.home-shortcuts .shortcut-icon{font-size:22px}
+.bottom-nav{position:fixed;z-index:20;bottom:0;left:0;right:0;display:grid;grid-template-columns:repeat(4,1fr);background:#fff;border-top:1px solid #e3e8ee;padding:7px 5px calc(7px + env(safe-area-inset-bottom));box-shadow:0 -3px 12px #1822300b}
+.bottom-nav button{background:transparent;color:#667085;padding:7px 2px;font-size:11px;min-height:48px;border-radius:8px}
+.bottom-nav button.active{color:#1673d1;background:#eff6ff}
+#settingsGear{float:right;background:#f2f5f8;color:#344054;border-radius:50%;min-height:40px;width:42px;padding:0;font-size:20px}
+@media(max-width:380px){.home-shortcuts{gap:7px}.home-shortcuts button{padding:11px 8px;font-size:12px}}
+@media print{.bottom-nav,.home-shortcuts,#settingsGear{display:none!important}main{padding:0}}
+
 </style>
 </head>
 <body>
-<header><h1>💰 Cash Manager</h1><p>Your daily cash book · Works offline</p><div class="balance-label">CURRENT CLOSING BALANCE</div><div class="balance" id="balance">₹0.00</div></header>
+<header><button id="settingsGear" onclick="openSettings()" aria-label="Settings">⚙</button><h1>💰 Cash Manager</h1><p>Your daily cash book · Works offline</p><div class="balance-label">CURRENT CLOSING BALANCE</div><div class="balance" id="balance">₹0.00</div></header>
 <main>
+<div class="home-shortcuts">
+<button onclick="focusTransaction('received')"><span class="shortcut-icon">⬇️</span><span>Received</span></button>
+<button onclick="focusTransaction('paid')"><span class="shortcut-icon">⬆️</span><span>Paid</span></button>
+<button onclick="openOpening()"><span class="shortcut-icon">💰</span><span>Set Opening Balance</span></button>
+<button onclick="openHistory()"><span class="shortcut-icon">🕒</span><span>History</span></button>
+<button onclick="openReports()"><span class="shortcut-icon">📊</span><span>Reports</span></button>
+<button onclick="printHistory()"><span class="shortcut-icon">🖨️</span><span>Print / Save PDF</span></button>
+<button onclick="exportCSV()"><span class="shortcut-icon">📄</span><span>Export CSV</span></button>
+<button onclick="openSettings()"><span class="shortcut-icon">⚙️</span><span>More / Settings</span></button>
+</div>
 <div class="cards">
 <div class="card"><small>Opening Balance</small><strong id="opening">₹0.00</strong></div>
 <div class="card"><small>Total Received</small><strong class="green" id="totalIn">₹0.00</strong></div>
@@ -146,9 +175,24 @@ button{padding:12px;font-size:14px;min-height:44px}
 <button class="neutral" style="width:100%;margin-top:8px" onclick="resetLogoChoice()">Reset Logo Choice</button>
 <p class="note">Android creates a Home Screen shortcut; the installed app's original launcher icon itself cannot be replaced dynamically by a gallery image on all Android launchers.</p>
 </div></details>
-\n<p class="note" style="padding:6px 2px">Your data stays on this device. Clearing app data or uninstalling may erase it. Export CSV regularly as a backup. No data is sent online.</p>
+
+<p class="note" style="padding:6px 2px">Your data stays on this device. Clearing app data or uninstalling may erase it. Export CSV regularly as a backup. No data is sent online.</p>
 </main>
+<nav class="bottom-nav" aria-label="Main navigation">
+<button class="active" onclick="goHome()">⌂<br>Home</button>
+<button onclick="openHistory()">◷<br>History</button>
+<button onclick="openReports()">▥<br>Reports</button>
+<button onclick="openSettings()">☰<br>More</button>
+</nav>
 <script>
+
+function focusTransaction(kind){$('kind').value=kind;document.querySelector('.section:not(.collapsible)').scrollIntoView({behavior:'smooth',block:'start'});$('amount').focus()}
+function openOpening(){const el=document.querySelector('summary')?.closest('details');const d=[...document.querySelectorAll('details')].find(x=>x.querySelector('summary')?.textContent.includes('Set Opening Balance'));if(d){d.open=true;d.scrollIntoView({behavior:'smooth',block:'start'})}}
+function openHistory(){const d=[...document.querySelectorAll('details')].find(x=>x.querySelector('summary')?.textContent.includes('History & Reports'));if(d){d.open=true;d.scrollIntoView({behavior:'smooth',block:'start'})}}
+function openReports(){openHistory();setTimeout(()=>document.getElementById('history')?.scrollIntoView({behavior:'smooth',block:'start'}),200)}
+function openSettings(){const d=$('appSettings');if(d){d.open=true;d.scrollIntoView({behavior:'smooth',block:'start'})}}
+function goHome(){window.scrollTo({top:0,behavior:'smooth'});document.querySelectorAll('.bottom-nav button').forEach((b,i)=>b.classList.toggle('active',i===0))}
+
 const KEY='cashManager.v1';
 let data={opening:0,transactions:[]},editing=null;let activeFilters={from:'',to:'',kind:'all',person:'',text:''};
 const $=id=>document.getElementById(id);
@@ -260,6 +304,7 @@ function makePresetShortcut(emoji,label){const name=$('appShortcutName').value.t
 $('customLogoFile')?.addEventListener('change',function(){const file=this.files&&this.files[0];if(!file)return;if(file.size>3*1024*1024){alert('Please choose an image smaller than 3 MB.');this.value='';return}const reader=new FileReader();reader.onload=()=>{selectedLogoData=String(reader.result||'').split(',')[1]||'';$('logoPreview').src=String(reader.result);$('logoPreviewWrap').style.display='block'};reader.readAsDataURL(file)});
 function saveCustomShortcut(){if(!selectedLogoData){alert('Please choose a logo image first.');return}if(!window.AndroidPrint||!AndroidPrint.createHomeShortcut){alert('Shortcut creation is available in the Android app only.');return}const name=$('appShortcutName').value.trim()||'Cash Manager';AndroidPrint.createHomeShortcut(name,selectedLogoData);alert('Custom shortcut request sent. Check your Home Screen.')}
 function resetLogoChoice(){selectedLogoData='';$('customLogoFile').value='';$('logoPreview').removeAttribute('src');$('logoPreviewWrap').style.display='none';$('appShortcutName').value='Cash Manager';alert('Logo choice reset. Existing shortcuts may need to be removed manually from Home Screen.')}
-\n$('kind').addEventListener('change',()=>{});for(const den of denominations){$('den'+den).addEventListener('input',calculateCashCount);const tx=$('txden'+den);if(tx)tx.addEventListener('input',calculateTxCash)}load();calculateTxCash();
+
+$('kind').addEventListener('change',()=>{});for(const den of denominations){$('den'+den).addEventListener('input',calculateCashCount);const tx=$('txden'+den);if(tx)tx.addEventListener('input',calculateTxCash)}load();calculateTxCash();
 </script>
 </body></html>
