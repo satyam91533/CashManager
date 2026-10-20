@@ -211,13 +211,12 @@ details.collapsible:not([open])>.inside{display:block!important}
 function showPanel(id){$('dashboard').classList.add('hidden');document.querySelectorAll('.screen-panel').forEach(p=>p.classList.toggle('active',p.id===id));document.querySelectorAll('.bottom-nav button').forEach(b=>b.classList.remove('active'));window.scrollTo({top:0,behavior:'smooth'})}
 function backHome(){document.querySelectorAll('.screen-panel').forEach(p=>p.classList.remove('active'));$('dashboard').classList.remove('hidden');document.querySelectorAll('.bottom-nav button').forEach((b,i)=>b.classList.toggle('active',i===0));window.scrollTo({top:0,behavior:'smooth'})}
 function focusTransaction(kind){$('kind').value=kind;showPanel('transactionPanel');$('formTitle').textContent=kind==='received'?'＋ Add Received':'− Add Paid';$('amount').focus()}
-function scrollToSection(el){if(el)el.scrollIntoView({behavior:'smooth',block:'start'})}
-function openOpening(){scrollToSection([...document.querySelectorAll('.section')].find(x=>x.querySelector('h2')?.textContent.includes('Set Opening Balance')))}
-function openHistory(){scrollToSection([...document.querySelectorAll('.section')].find(x=>x.querySelector('h2')?.textContent.includes('History & Reports')))}
-function openReports(){openHistory();setTimeout(()=>document.getElementById('history')?.scrollIntoView({behavior:'smooth',block:'start'}),200)}
-function openCashCount(){scrollToSection(document.getElementById('cashCountSection'))}
+function openOpening(){showPanel('openingPanel')}
+function openHistory(){showPanel('historyPanel')}
+function openReports(){showPanel('historyPanel');setTimeout(()=>document.getElementById('history')?.scrollIntoView({behavior:'smooth',block:'start'}),200)}
+function openCashCount(){showPanel('cashCountSection')}
 function openMore(){openCashCount()}
-function goHome(){window.scrollTo({top:0,behavior:'smooth'});document.querySelectorAll('.bottom-nav button').forEach((b,i)=>b.classList.toggle('active',i===0))}
+function goHome(){backHome()}
 
 const KEY='cashManager.v1';
 let data={opening:0,transactions:[]},editing=null;let activeFilters={from:'',to:'',kind:'all',person:'',text:''};
