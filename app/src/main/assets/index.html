@@ -5,18 +5,18 @@
 <meta name="theme-color" content="#075e54">
 <title>Cash Manager</title>
 <style>
-:root{font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;color:#142b2a;background:linear-gradient(145deg,#f0fdfa,#f4f7fb)}
-*{box-sizing:border-box}body{margin:0}header{background:linear-gradient(130deg,#047857,#0f766e,#2563eb);color:white;padding:22px 18px 26px;border-radius:0 0 26px 26px;box-shadow:0 10px 28px #075e5428}
-header h1{margin:0;font-size:25px}header p{margin:5px 0 18px;color:#cfe4dc;font-size:13px}
+:root{font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;color:#182230;background:#f6f8fb}
+*{box-sizing:border-box}body{margin:0}header{background:#fff;color:#182230;padding:18px 16px 20px;border-radius:0 0 18px 18px;box-shadow:0 2px 12px #15233b0c;border-bottom:1px solid #e8edf3}
+header h1{margin:0;font-size:25px}header p{margin:5px 0 18px;color:#64748b;font-size:13px}
 .balance-label{font-size:13px;color:#cfe4dc}.balance{font-size:34px;font-weight:750;margin-top:4px}
 main{padding:16px;max-width:720px;margin:auto}.cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:-3px}
-.card{background:white;border:1px solid #e1eeeb;border-radius:16px;padding:14px;box-shadow:0 5px 18px #0f766e0d}
+.card{background:#fff;border:1px solid #e8edf3;border-radius:14px;padding:14px;box-shadow:0 2px 8px #18223006}
 .card small{display:block;color:#65736f;font-size:12px}.card strong{display:block;font-size:20px;margin-top:7px;overflow-wrap:anywhere}
-.green{color:#16834a}.red{color:#c52d37}.section{background:white;border:1px solid #e4eeec;border-radius:17px;padding:16px;margin-top:14px;box-shadow:0 6px 20px #0f766e0b}
+.green{color:#16834a}.red{color:#c52d37}.section{background:#fff;border:1px solid #e8edf3;border-radius:14px;padding:16px;margin-top:12px;box-shadow:0 2px 8px #18223005}
 h2{font-size:17px;margin:0 0 13px}label{display:block;font-size:13px;font-weight:650;margin:10px 0 5px}
 input,select,button{font:inherit}input,select{width:100%;padding:12px;border:1px solid #d8e0dc;border-radius:9px;background:white}
 .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:13px}
-button{border:0;border-radius:12px;padding:12px;font-weight:750;cursor:pointer;transition:transform .12s,filter .12s}button:active{transform:scale(.98)}.receive{background:linear-gradient(135deg,#059669,#10b981);color:white}.paid{background:linear-gradient(135deg,#dc2626,#f97316);color:white}.neutral{background:#edf4f2;color:#203b37}
+button{border:0;border-radius:12px;padding:12px;font-weight:750;cursor:pointer;transition:transform .12s,filter .12s}button:active{transform:scale(.98)}.receive{background:#16834a;color:white}.paid{background:#dc3545;color:white}.neutral{background:#eef2f6;color:#243244}
 #history{display:flex;flex-direction:column;gap:9px}.entry{border:1px solid #e3e9e6;border-radius:11px;padding:12px}.entry-top{display:flex;justify-content:space-between;gap:10px}.entry small{color:#687770}.entry p{margin:5px 0;font-size:13px}.entry .tools{display:flex;gap:7px;margin-top:8px}.tools button{padding:7px 10px;font-size:12px}
 .note{font-size:12px;color:#64716b;line-height:1.5}.empty{color:#6b7772;text-align:center;padding:20px 5px}
 @media print{
@@ -128,7 +128,25 @@ button{padding:12px;font-size:14px;min-height:44px}
 <div id="history"></div>
 <p class="note">Transactions are kept for the last 6 months. Search by name, date, or reason.</p>
 </div></details>
-<p class="note" style="padding:6px 2px">Your data stays on this device. Clearing app data or uninstalling may erase it. Export CSV regularly as a backup. No data is sent online.</p>
+
+<details class="section collapsible" id="appSettings">
+<summary>⚙️ App Settings & Logo</summary><div class="inside">
+<p class="note">Choose a simple shortcut icon for your phone Home Screen, or use your own image.</p>
+<label for="appShortcutName">Shortcut name</label><input id="appShortcutName" maxlength="30" value="Cash Manager" placeholder="Cash Manager">
+<label>Choose a ready-made icon</label>
+<div class="actions">
+<button class="neutral" onclick="makePresetShortcut('💰','Cash Manager')">💰 Wallet</button>
+<button class="neutral" onclick="makePresetShortcut('🏪','My Shop')">🏪 Shop</button>
+<button class="neutral" onclick="makePresetShortcut('📒','Cash Book')">📒 Cash Book</button>
+<button class="neutral" onclick="makePresetShortcut('🟢','My Business')">🟢 Minimal</button>
+</div>
+<label for="customLogoFile">Or choose your own logo (PNG/JPG)</label><input id="customLogoFile" type="file" accept="image/png,image/jpeg,image/webp">
+<div id="logoPreviewWrap" style="display:none;text-align:center;margin-top:12px"><img id="logoPreview" alt="Custom logo preview" style="width:88px;height:88px;object-fit:cover;border-radius:20px;border:1px solid #e1e7ee"><p class="note">Logo preview</p></div>
+<button class="receive" style="width:100%;margin-top:10px" onclick="saveCustomShortcut()">Create Home Screen Shortcut</button>
+<button class="neutral" style="width:100%;margin-top:8px" onclick="resetLogoChoice()">Reset Logo Choice</button>
+<p class="note">Android creates a Home Screen shortcut; the installed app's original launcher icon itself cannot be replaced dynamically by a gallery image on all Android launchers.</p>
+</div></details>
+\n<p class="note" style="padding:6px 2px">Your data stays on this device. Clearing app data or uninstalling may erase it. Export CSV regularly as a backup. No data is sent online.</p>
 </main>
 <script>
 const KEY='cashManager.v1';
@@ -236,6 +254,12 @@ function exportCSV(){if(!confirm('Export the currently filtered history to a CSV
  for(const t of ts){const inc=t.kind==='received'?Number(t.amount):0,out=t.kind==='paid'?Number(t.amount):0;bal+=inc-out;if(allowed.has(t.id))lines.push([t.date,t.kind,t.person,t.description,inc,out,bal.toFixed(2)])}
  const csv=lines.map(row=>row.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\r\n');
  const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='cash-manager-'+today()+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);alert('CSV export started successfully!')}
-$('kind').addEventListener('change',()=>{});for(const den of denominations){$('den'+den).addEventListener('input',calculateCashCount);const tx=$('txden'+den);if(tx)tx.addEventListener('input',calculateTxCash)}load();calculateTxCash();
+
+let selectedLogoData='';
+function makePresetShortcut(emoji,label){const name=$('appShortcutName').value.trim()||label;const canvas=document.createElement('canvas');canvas.width=256;canvas.height=256;const ctx=canvas.getContext('2d');ctx.fillStyle='#16834a';ctx.fillRect(0,0,256,256);ctx.font='150px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(emoji,128,132);const data=canvas.toDataURL('image/png').split(',')[1];if(window.AndroidPrint&&AndroidPrint.createHomeShortcut){AndroidPrint.createHomeShortcut(name,data);alert('Shortcut request sent. Check your Home Screen.')}else alert('Shortcut creation is available in the Android app only.')}
+$('customLogoFile')?.addEventListener('change',function(){const file=this.files&&this.files[0];if(!file)return;if(file.size>3*1024*1024){alert('Please choose an image smaller than 3 MB.');this.value='';return}const reader=new FileReader();reader.onload=()=>{selectedLogoData=String(reader.result||'').split(',')[1]||'';$('logoPreview').src=String(reader.result);$('logoPreviewWrap').style.display='block'};reader.readAsDataURL(file)});
+function saveCustomShortcut(){if(!selectedLogoData){alert('Please choose a logo image first.');return}if(!window.AndroidPrint||!AndroidPrint.createHomeShortcut){alert('Shortcut creation is available in the Android app only.');return}const name=$('appShortcutName').value.trim()||'Cash Manager';AndroidPrint.createHomeShortcut(name,selectedLogoData);alert('Custom shortcut request sent. Check your Home Screen.')}
+function resetLogoChoice(){selectedLogoData='';$('customLogoFile').value='';$('logoPreview').removeAttribute('src');$('logoPreviewWrap').style.display='none';$('appShortcutName').value='Cash Manager';alert('Logo choice reset. Existing shortcuts may need to be removed manually from Home Screen.')}
+\n$('kind').addEventListener('change',()=>{});for(const den of denominations){$('den'+den).addEventListener('input',calculateCashCount);const tx=$('txden'+den);if(tx)tx.addEventListener('input',calculateTxCash)}load();calculateTxCash();
 </script>
 </body></html>
