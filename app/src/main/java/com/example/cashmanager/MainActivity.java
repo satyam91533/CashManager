@@ -95,7 +95,8 @@ public class MainActivity extends FragmentActivity {
             .build();
         prompt.authenticate(info);
     }
-\n    private class PrintBridge {
+
+    private class PrintBridge {
         @JavascriptInterface
         public void createHomeShortcut(String label, String base64Png) {
             runOnUiThread(() -> {
