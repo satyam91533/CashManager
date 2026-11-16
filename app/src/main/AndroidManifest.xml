@@ -1,4 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.USE_BIOMETRIC" />
     <application android:theme="@android:style/Theme.Material.Light.NoActionBar"
         android:label="Cash Manager" android:icon="@drawable/ic_cash_manager" android:usesCleartextTraffic="false">
         <activity android:name=".MainActivity" android:exported="true">
