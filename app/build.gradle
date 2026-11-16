@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.application'
 }
+
 android {
     namespace 'com.example.cashmanager'
     compileSdk 35
@@ -11,6 +12,13 @@ android {
         versionCode 1
         versionName '1.0'
     }
+}
+
+configurations.configureEach {
+    // Kotlin 1.8+ already contains the JDK 7/8 extensions.
+    // Exclude old split artifacts pulled transitively by AndroidX dependencies.
+    exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk7'
+    exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk8'
 }
 
 dependencies {
