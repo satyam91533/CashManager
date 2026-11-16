@@ -1,6 +1,10 @@
 package com.example.cashmanager;
 
-import android.app.Activity;
+import androidx.fragment.app.FragmentActivity;
+import androidx.biometric.BiometricManager;
+import androidx.biometric.BiometricPrompt;
+import java.util.concurrent.Executor;
+import android.content.SharedPreferences;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ShortcutInfo;
@@ -19,7 +23,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
-public class MainActivity extends Activity {
+public class MainActivity extends FragmentActivity {
     private WebView web;
 
     @Override public void onCreate(Bundle savedInstanceState) {
@@ -33,6 +37,7 @@ public class MainActivity extends Activity {
         settings.setAllowFileAccess(true);
         settings.setAllowContentAccess(true);
         web.addJavascriptInterface(new PrintBridge(), "AndroidPrint");
+        web.addJavascriptInterface(new SecurityBridge(), "AndroidSecurity");
         setContentView(web);
         web.loadUrl("file:///android_asset/index.html");
     }
@@ -45,7 +50,52 @@ public class MainActivity extends Activity {
         }
     }
 
-    private class PrintBridge {
+
+    private class SecurityBridge {
+        @JavascriptInterface public boolean isBiometricEnabled() {
+            return getSharedPreferences("cash_manager_security", MODE_PRIVATE).getBoolean("biometric_enabled", false);
+        }
+        @JavascriptInterface public boolean canUseBiometric() {
+            return BiometricManager.from(MainActivity.this).canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG) == BiometricManager.BIOMETRIC_SUCCESS;
+        }
+        @JavascriptInterface public void enableBiometric() {
+            runOnUiThread(() -> {
+                int status = BiometricManager.from(MainActivity.this).canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG);
+                if (status != BiometricManager.BIOMETRIC_SUCCESS) {
+                    web.evaluateJavascript("window.onBiometricSetupResult && window.onBiometricSetupResult(false, 'Fingerprint/biometric is not enrolled or unavailable on this device.')", null);
+                    return;
+                }
+                authenticateBiometric(success -> {
+                    if (success) getSharedPreferences("cash_manager_security", MODE_PRIVATE).edit().putBoolean("biometric_enabled", true).apply();
+                    web.evaluateJavascript("window.onBiometricSetupResult && window.onBiometricSetupResult(" + success + ", " + (success ? "'Biometric lock enabled.'" : "'Authentication cancelled.'") + ")", null);
+                });
+            });
+        }
+        @JavascriptInterface public void disableBiometric() {
+            getSharedPreferences("cash_manager_security", MODE_PRIVATE).edit().putBoolean("biometric_enabled", false).apply();
+            runOnUiThread(() -> web.evaluateJavascript("window.onBiometricSetupResult && window.onBiometricSetupResult(true, 'Biometric lock disabled.')", null));
+        }
+        @JavascriptInterface public void authenticate() {
+            runOnUiThread(() -> authenticateBiometric(success -> web.evaluateJavascript("window.onBiometricResult && window.onBiometricResult(" + success + ")", null)));
+        }
+    }
+    private interface BiometricResult { void onResult(boolean success); }
+    private void authenticateBiometric(BiometricResult result) {
+        Executor executor = getMainExecutor();
+        BiometricPrompt prompt = new BiometricPrompt(this, executor, new BiometricPrompt.AuthenticationCallback() {
+            @Override public void onAuthenticationSucceeded(BiometricPrompt.AuthenticationResult authResult) { result.onResult(true); }
+            @Override public void onAuthenticationError(int errorCode, CharSequence errString) { result.onResult(false); }
+            @Override public void onAuthenticationFailed() { }
+        });
+        BiometricPrompt.PromptInfo info = new BiometricPrompt.PromptInfo.Builder()
+            .setTitle("Cash Manager Lock")
+            .setSubtitle("Authenticate to access your cash book")
+            .setNegativeButtonText("Cancel")
+            .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG)
+            .build();
+        prompt.authenticate(info);
+    }
+\n    private class PrintBridge {
         @JavascriptInterface
         public void createHomeShortcut(String label, String base64Png) {
             runOnUiThread(() -> {
